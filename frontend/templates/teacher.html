@@ -1,0 +1,26 @@
+<div id="teacher-tab" class="tab-content active">
+    <form id="teacher-form">
+        <div class="form-group">
+            <label>ФИО ученика</label>
+            <input type="text" id="t-name" placeholder="Иванов Иван Иванович" required>
+        </div>
+        <div class="form-group">
+            <label>Текст задания</label>
+            <textarea id="t-task" rows="3" placeholder="Опишите задание..." required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Критерии оценивания</label>
+            <textarea id="t-criteria" rows="4"
+                placeholder="1. Полнота ответа (0-3 балла)&#10;2. Ключевые понятия (0-3)&#10;3. Логика и структура (0-2)&#10;4. Язык и грамотность (0-2)"
+                required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Фото работы или ZIP-архив с фото (JPG/PNG, до 5 МБ; ZIP до 10 фото)</label>
+            <label class="file-label" for="t-image">📁 Выбрать файл</label>
+            <input type="file" id="t-image" accept="image/jpeg,image/png,application/zip,.zip" required>
+            <div id="t-preview" class="preview hidden"></div>
+        </div>
+        <button type="submit" class="btn" id="t-submit">Проверить и сохранить</button>
+    </form>
+    <div id="teacher-result"></div>
+</div>

@@ -1,0 +1,39 @@
+<div id="auth-screen" class="auth-container">
+    <div class="hero">
+        <h1>🌸 Grader</h1>
+        <p>Нейросетевая проверка письменных работ</p>
+    </div>
+
+    <div class="auth-tabs">
+        <button class="auth-tab-btn active" data-auth="login">Войти</button>
+        <button class="auth-tab-btn" data-auth="register">Регистрация</button>
+    </div>
+
+    <div class="auth-body">
+        <div id="login-panel">
+            <div id="login-error" class="auth-error hidden"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="login-password" placeholder="••••••">
+            </div>
+            <button class="btn" id="login-btn">Войти</button>
+        </div>
+
+        <div id="register-panel" class="hidden">
+            <div id="register-error" class="auth-error hidden"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="reg-email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label>Пароль <span style="font-weight:400;color:#c28e9f">(минимум 6 символов)</span></label>
+                <input type="password" id="reg-password" placeholder="••••••">
+            </div>
+            <button class="btn" id="register-btn">Создать аккаунт</button>
+        </div>
+    </div>
+</div>

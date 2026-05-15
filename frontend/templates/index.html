@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Grader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% include "auth.html" %}
+
+<div id="app-screen" class="glass-container hidden">
+    <div class="hero">
+        <h1>🌸 Grader</h1>
+        <p>Автоматическая проверка письменных работ с нейросетью</p>
+        <div class="user-bar">
+            <span id="user-email"></span>
+            <button class="btn-logout" id="logout-btn">Выйти</button>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="teacher">Один ученик</button>
+        <button class="tab-btn" data-tab="group">Весь класс</button>
+        <button class="tab-btn" data-tab="results">Результаты</button>
+    </div>
+
+    {% include "teacher.html" %}
+    {% include "group.html" %}
+    {% include "results.html" %}
+
+    <footer>
+        💖 Grader проверяет на основе ИИ. Он может ошибаться, в том числе давать неверную информацию о людях
+    </footer>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
