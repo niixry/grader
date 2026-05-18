@@ -6,7 +6,7 @@ import zipfile
 from flask import Blueprint, jsonify, request, session
 
 from decorators import login_required
-from models import Result, db
+from models import Group, Result, db
 from utils import analyze_with_ai
 
 check_bp = Blueprint("check", __name__)
@@ -61,6 +61,11 @@ def check():
         return jsonify({"error": "Введите критерии оценивания"}), 400
     if not image_file:
         return jsonify({"error": "Загрузите фотографию или ZIP-архив"}), 400
+
+    if group_id is not None:
+        owns_group = Group.query.filter_by(id=group_id, user_id=user_id).first()
+        if not owns_group:
+            return jsonify({"error": "Группа не найдена"}), 400
 
     try:
         ct = image_file.content_type or ""
