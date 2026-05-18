@@ -1,6 +1,33 @@
 function esc(s) {
     return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+let csrfToken = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+
+async function refreshCsrfToken() {
+    try {
+        const r = await fetch('/api/csrf');
+        if (r.ok) {
+            const d = await r.json();
+            csrfToken = d.csrf_token || '';
+        }
+    } catch { /* ignore */ }
+}
+
+async function apiFetch(url, options = {}) {
+    const method = (options.method || 'GET').toUpperCase();
+    const opts = { ...options, headers: { ...(options.headers || {}) } };
+    if (method !== 'GET' && method !== 'HEAD') {
+        opts.headers['X-CSRF-Token'] = csrfToken;
+    }
+    let r = await fetch(url, opts);
+    if (r.status === 403 && method !== 'GET' && method !== 'HEAD') {
+        await refreshCsrfToken();
+        opts.headers['X-CSRF-Token'] = csrfToken;
+        r = await fetch(url, opts);
+    }
+    return r;
+}
 function fmtDate(iso) {
     return iso ? new Date(iso).toLocaleString('ru-RU') : '';
 }
@@ -59,7 +86,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     btn.innerHTML = '<span class="spinner"></span> Входим...';
 
     try {
-        const r = await fetch('/api/login', {
+        const r = await apiFetch('/api/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email, password}),
@@ -89,7 +116,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
     btn.innerHTML = '<span class="spinner"></span> Создаём аккаунт...';
 
     try {
-        const r = await fetch('/api/register', {
+        const r = await apiFetch('/api/register', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email, password}),
@@ -106,7 +133,8 @@ document.getElementById('register-btn').addEventListener('click', async () => {
 });
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
-    await fetch('/api/logout', {method: 'POST'});
+    await apiFetch('/api/logout', {method: 'POST'});
+    await refreshCsrfToken();
     showAuth();
 });
 
@@ -170,7 +198,7 @@ async function submitTeacherCheck() {
     document.getElementById('teacher-result').innerHTML = '';
 
     try {
-        const r    = await fetch('/check', {method: 'POST', body: formData});
+        const r    = await apiFetch('/check', {method: 'POST', body: formData});
         const data = await r.json();
         renderCheckResult('teacher-result', data);
     } catch {
@@ -202,7 +230,7 @@ async function loadGroups() {
 
         const filter = document.getElementById('r-group-filter');
         if (filter) filter.innerHTML = '<option value="">Все группы</option>' + options;
-    } catch { /* игнорим */ }
+    } catch { /* ignore */ }
 }
 
 async function loadResults() {
@@ -248,7 +276,7 @@ async function loadResults() {
 
 async function deleteResult(id, cardEl) {
     try {
-        await fetch(`/results/${id}`, {method: 'DELETE'});
+        await apiFetch(`/results/${id}`, {method: 'DELETE'});
         cardEl.remove();
         if (!document.querySelector('.result-item'))
             document.getElementById('results-list').innerHTML =
@@ -265,7 +293,7 @@ document.getElementById('g-group-new').addEventListener('click', async () => {
     const name = prompt('Название группы (например: Контрольная №3, 9А)');
     if (!name || !name.trim()) return;
     try {
-        const r = await fetch('/groups', {
+        const r = await apiFetch('/groups', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({name: name.trim()}),
@@ -362,7 +390,7 @@ document.getElementById('group-form').addEventListener('submit', async e => {
         if (file) fd.append('image', file);
 
         try {
-            const r    = await fetch('/check', { method: 'POST', body: fd });
+            const r    = await apiFetch('/check', { method: 'POST', body: fd });
             const data = await r.json();
             renderGroupResult(`g-result-${n}`, name, data);
         } catch {
