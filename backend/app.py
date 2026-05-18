@@ -1,6 +1,7 @@
-from flask import Flask, render_template, session
+from flask import Flask, jsonify, render_template, session
 
 from config import Config
+from csrf import csrf_protect, get_or_create_csrf_token
 from models import db, User
 
 
@@ -13,10 +14,14 @@ def create_app():
     db.init_app(app)
 
     @app.before_request
-    def validate_session():
+    def before():
         if "user_id" in session:
             if not db.session.get(User, session["user_id"]):
                 session.clear()
+        get_or_create_csrf_token()
+        err = csrf_protect()
+        if err:
+            return err
 
     from routes.auth import auth_bp
     from routes.check import check_bp
@@ -30,7 +35,11 @@ def create_app():
 
     @app.route("/")
     def index():
-        return render_template("index.html")
+        return render_template("index.html", csrf_token=get_or_create_csrf_token())
+
+    @app.route("/api/csrf")
+    def csrf():
+        return jsonify({"csrf_token": get_or_create_csrf_token()})
 
     return app
 
