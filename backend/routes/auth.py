@@ -1,17 +1,24 @@
 from flask import Blueprint, jsonify, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from config import Config
 from decorators import login_required
 from models import User, db
-
+import hmac
 auth_bp = Blueprint("auth", __name__)
 
 
 @auth_bp.route("/api/register", methods=["POST"])
 def register():
-    data     = request.get_json()
-    email    = (data.get("email") or "").strip().lower()
-    password = data.get("password") or ""
+    data        = request.get_json()
+    email       = (data.get("email") or "").strip().lower()
+    password    = data.get("password") or ""
+    invite_code = (data.get("invite_code") or "").strip()
+
+    if not Config.INVITE_CODE:
+        return jsonify({"error": "Регистрация закрыта"}), 403
+    if not invite_code or not hmac.compare_digest(invite_code, Config.INVITE_CODE):
+        return jsonify({"error": "Неверный код приглашения"}), 403
 
     if not email or not password:
         return jsonify({"error": "Введите email и пароль"}), 400
