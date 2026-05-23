@@ -10,3 +10,4 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"  # блокирует cross-site POST → защита от CSRF
+    INVITE_CODE = os.environ.get("INVITE_CODE", "")
