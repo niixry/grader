@@ -108,9 +108,10 @@ document.getElementById('login-password').addEventListener('keydown', e => {
 
 document.getElementById('register-btn').addEventListener('click', async () => {
     hideError('register-error');
-    const email    = document.getElementById('reg-email').value.trim();
-    const password = document.getElementById('reg-password').value;
-    const btn      = document.getElementById('register-btn');
+    const email       = document.getElementById('reg-email').value.trim();
+    const password    = document.getElementById('reg-password').value;
+    const invite_code = document.getElementById('reg-invite').value.trim();
+    const btn         = document.getElementById('register-btn');
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Создаём аккаунт...';
@@ -119,7 +120,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         const r = await apiFetch('/api/register', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password}),
+            body: JSON.stringify({email, password, invite_code}),
         });
         const d = await r.json();
         if (d.error) { showError('register-error', d.error); return; }
